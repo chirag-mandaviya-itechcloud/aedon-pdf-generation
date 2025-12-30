@@ -3,8 +3,10 @@
         <lightning-spinner alternative-text="Loading PDF..."></lightning-spinner>
     </template>
     <template if:true={showIframe}>
-        <iframe src={iframeUrl} width="100%" height="600px" frameborder="0" title="Invoice PDF">
-        </iframe>
+        <div class="pdf-container">
+            <iframe src={iframeUrl} width="100%" height="600px" frameborder="0" title="Invoice PDF">
+            </iframe>
+        </div>
     </template>
     <template if:false={showIframe}>
         <template if:false={isLoading}>

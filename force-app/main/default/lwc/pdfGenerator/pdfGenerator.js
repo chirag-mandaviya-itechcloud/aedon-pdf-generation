@@ -6,12 +6,14 @@ export default class PdfGenerator extends LightningElement {
     invoiceDetails = {};
     templateName = '';
     isLoading = true;
+    baseUrl = '';
 
     @wire(CurrentPageReference)
     getPageRef(pageRef) {
         if (pageRef) {
             // Quick Action recordId comes from state.recordId
             this.recordId = pageRef.state?.recordId;
+            this.baseUrl = window.location.origin;
 
             if (this.recordId) {
                 console.log('Record ID from PageReference:', this.recordId);
@@ -37,7 +39,6 @@ export default class PdfGenerator extends LightningElement {
     }
 
     setTemplateName() {
-        // Set the template name based on your logic
         this.templateName = 'Default_Layout';
 
         if (this.invoiceDetails?.s2p3__To_Account__r?.s2p3__Default_Invoice_Layout__c) {
