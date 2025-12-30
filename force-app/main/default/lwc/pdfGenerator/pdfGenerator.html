@@ -1,3 +1,16 @@
 <template>
-
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading PDF..."></lightning-spinner>
+    </template>
+    <template if:true={showIframe}>
+        <iframe src={iframeUrl} width="100%" height="600px" frameborder="0" title="Invoice PDF">
+        </iframe>
+    </template>
+    <template if:false={showIframe}>
+        <template if:false={isLoading}>
+            <div class="slds-text-color_error">
+                Unable to load PDF. Please check the invoice details.
+            </div>
+        </template>
+    </template>
 </template>

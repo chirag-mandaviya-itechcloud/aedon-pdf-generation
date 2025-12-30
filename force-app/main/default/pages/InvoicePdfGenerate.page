@@ -1,0 +1,166 @@
+<apex:page standardController="Account" extensions="EmailTemplateToPDFController" 
+           showHeader="false" sidebar="false" showQuickActionVfHeader="false"
+           applyBodyTag="false" applyHtmlTag="false">
+    
+    <html>
+        <head>
+            <style>
+                html, body {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                overflow: hidden;
+                }
+                .slds-modal {
+                position: fixed;
+                z-index: 1002;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: white;
+                padding: 0;
+                border: none;
+                }
+                .slds-modal__header {
+                padding:15px;
+                } 
+                .slds-modal__content {
+                width: 100%;
+                height: 100%;
+                }
+                .loader-overlay {
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                background: rgba(255,255,255,0.75);
+                z-index: 2000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                }
+                .text{
+                font-size: 15px;
+                }
+                .disabled-button {
+                opacity: 0.6;
+                cursor: not-allowed !important;
+                pointer-events: none;
+                background: #cccccc !important;
+                border-color: #cccccc !important;
+                }
+            </style>
+        </head>
+        
+        <body>
+            <apex:form >
+                <div id="loader" class="loader-overlay">
+                    <div role="status" class="slds-spinner slds-spinner_large slds-spinner_brand">
+                        <span class="text">Loading...</span>
+                        
+                    </div>
+                </div>
+                
+                <div class="slds-modal">
+                   	<!--
+                    <div class="slds-modal__header">
+                        <center>
+                            <apex:outputText id="messageOutput" value="{!message}" 
+                                             style="{!IF(CONTAINS(message, '✅'), 'color:green;', IF(CONTAINS(message, '⚠'), 'color:orange;', 'color:red;'))} font-size:17px;font-weight:bold;" />
+                        </center>
+                        <center>
+                            <div style="display: flex; justify-content: center; align-items: end; gap: 8px; margin: 9px;">
+                                
+                                <div style="text-align: left; display: flex;">
+                                    
+                                    <label for="emailInput" style="font-size: 14px; font-weight: bold; align-self: center;">Enter CC Email:  </label>
+                                    <apex:inputText id="emailInput" value="{!customEmail}" 
+                                                    style="border-radius: 8px; border: 2.5px solid #7b877e; font-size: 14px; padding: 6px 10px; width: 450px; margin-left: 10px;" />
+                                </div>
+                                
+                                <apex:commandButton id="sendMailBtn" action="{!sendAllotmentLetter}" value="Send Mail"
+                                                    onclick="disableButton();"
+                                                    oncomplete="handleButtonStateAndClearEmail();"
+                                                    reRender="messageOutput,emailInput"
+                                                    style="border-radius: 200px; font-size: 14px; padding: 6px 24px;
+                                                           color: white; cursor: pointer; border: 3.5px solid #00A129; background:#00A129;" />
+                            </div>
+                            <p style="font-size: 13px; color: #555; margin-bottom: 4px;">
+                                If you don't enter a CC email, the mail will go to the default customer
+                            </p>                            
+                        </center>                        
+                    </div>  
+					-->
+                    
+                    <div class="slds-modal__content">
+                        
+                        <iframe id="pdfFrame" 
+                                src="/apex/InvoicePDF?&templateDevName=Default_Layout&whatId={!acc.Id}&pdfType=Allotment_Letter" 
+                                width="100%" 
+                                height="100%" 
+                                frameborder="0"
+                                onload="hideLoader()"></iframe>
+                    </div>
+                </div>
+            </apex:form>
+            <script>
+            function hideLoader() {
+                document.getElementById('loader').style.display = 'none';
+            }
+            /*
+            function disableButton() {
+                var btn = document.querySelector('[id$="sendMailBtn"]');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('disabled-button');
+                }
+            }
+            
+            function enableButton() {
+                var btn = document.querySelector('[id$="sendMailBtn"]');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('disabled-button');
+                }
+            }
+            
+            function clearEmailInput() {
+                var emailInput = document.querySelector('[id$="emailInput"]');
+                if (emailInput) {
+                    emailInput.value = '';
+                }
+            }
+            
+            function handleButtonStateAndClearEmail() {
+                var msgEl = document.querySelector('[id$="messageOutput"]');
+                var msgText = msgEl ? msgEl.innerText.trim() : '';
+                clearEmailInput();
+                
+                if (msgText !== '') {
+                    // Message has value, keep button disabled and clear after 5 seconds
+                    setTimeout(function() {
+                        msgEl.innerText = '';
+                        enableButton();
+                    }, 5000);
+                } else {
+                    enableButton();
+                }
+            }
+            
+            function clearMessageAfterDelay() {
+                var msgEl = document.querySelector('[id$="messageOutput"]');
+                if (msgEl && msgEl.innerText.trim() !== '') {
+                    setTimeout(function() {
+                        msgEl.innerText = '';
+                    }, 3000);
+                }
+            }
+			*/            
+            window.onload = function() {
+                hideLoader();
+                //clearMessageAfterDelay();
+            };
+            </script>
+        </body>
+    </html>
+</apex:page>
