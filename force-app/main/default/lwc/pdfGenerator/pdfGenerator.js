@@ -59,4 +59,8 @@ export default class PdfGenerator extends LightningElement {
         console.log('iframeUrl:', this.iframeUrl);
         return !this.isLoading && this.iframeUrl;
     }
+
+    handleSendMail() {
+        console.log("Send Mail");
+    }
 }
