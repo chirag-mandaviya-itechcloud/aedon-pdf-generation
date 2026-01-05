@@ -17,7 +17,7 @@
     </template>
     <template if:true={showIframe}>
         <div style="text-align: end; margin: 10px;">
-            <lightning-button variant="brand" label="Send Mail" onclick={handleSendMail}
+            <lightning-button variant="brand" label={sendButtonLabel} onclick={handleSendMail} disabled={isSendingEmail}
                 class="slds-m-left_x-small"></lightning-button>
         </div>
     </template>

@@ -1,0 +1,128 @@
+<messaging:emailTemplate subject="Invoice {!relatedTo.Name}" recipientType="Contact" relatedToType="Sales_Invoice__c">
+    <messaging:htmlEmailBody >
+        <html>
+            <body style="font-family: Arial, sans-serif; margin: 0; background-color: #f5f5f5;">
+                <div style="max-width: 800px; margin: 0 auto; background-color: #ffffff; padding: 30px;">
+                    <!-- Header Section -->
+                    <div style="margin-bottom: 30px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="width: 70%;">
+                                    <div style="font-size: 30px; font-weight: bold; color: #333; margin-bottom: 20px;">Sales Invoice</div>
+                                </td>
+                                <td style="width: 30%; text-align: right; vertical-align: top;">
+                                    <!-- Company Logo - You can add image URL here -->
+                                    <!-- <img src="your-logo-url.png" width="200" alt="Company Logo"/> -->
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Information Section -->
+                    <table style="width: 100%; font-size: 12px; margin-bottom: 30px; border-collapse: collapse;">
+                        <tr>
+                            <td style="width: 40%; padding: 5px; vertical-align: top;">
+                                <div style="font-weight: bold;">{!relatedTo.To_Account__r.Name}</div>
+                                <div>{!relatedTo.To_Account__r.BillingStreet}</div>
+                                <div>{!relatedTo.To_Account__r.BillingCity}</div>
+                                <div>{!relatedTo.To_Account__r.BillingState} - {!relatedTo.To_Account__r.BillingPostalCode}</div>
+                                <div>{!relatedTo.To_Account__r.BillingCountry}</div>
+                            </td>
+                            <td style="width: 30%; padding: 5px; vertical-align: top;">
+                                <div style="font-weight: bold;">Invoice Number</div>
+                                <div>{!relatedTo.Name}</div>
+                                <br/>
+                                <div style="font-weight: bold;">Date</div>
+                                <div>{!relatedTo.Invoice_Date__c}</div>
+                                <br/>
+                                <div style="font-weight: bold;">Currency</div>
+                                <div>{!relatedTo.Transaction_Currency__r.Name}</div>
+                            </td>
+                            <td style="width: 30%; padding: 5px; vertical-align: top;">
+                                <div style="font-weight: bold;">{!relatedTo.Company__r.Name}</div>
+                                <div>{!relatedTo.Company__r.Company_Street__c}</div>
+                                <div>{!relatedTo.Company__r.Address_Line1__c}</div>
+                                <div>{!relatedTo.Company__r.Company_City__c}</div>
+                                <div>{!relatedTo.Company__r.Company_State__c}</div>
+                                <div>{!relatedTo.Company__r.Company_PostalCode__c}</div>
+                                <div>{!relatedTo.Company__r.Company_Country__c}</div>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <!-- Line Items Table -->
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%; background-color: #f0f0f0; padding: 10px 8px; text-align: left; border-bottom: 2px solid #333; font-weight: bold;">Product Name</th>
+                                <th style="width: 15%; background-color: #f0f0f0; padding: 10px 8px; text-align: center; border-bottom: 2px solid #333; font-weight: bold;">Description</th>
+                                <th style="width: 10%; background-color: #f0f0f0; padding: 10px 8px; text-align: right; border-bottom: 2px solid #333; font-weight: bold;">Quantity</th>
+                                <th style="width: 10%; background-color: #f0f0f0; padding: 10px 8px; text-align: right; border-bottom: 2px solid #333; font-weight: bold;">Unit Price</th>
+                                <th style="width: 10%; background-color: #f0f0f0; padding: 10px 8px; text-align: right; border-bottom: 2px solid #333; font-weight: bold;">Disc %</th>
+                                <th style="width: 10%; background-color: #f0f0f0; padding: 10px 8px; text-align: right; border-bottom: 2px solid #333; font-weight: bold;">Tax Rate</th>
+                                <th style="width: 10%; background-color: #f0f0f0; padding: 10px 8px; text-align: right; border-bottom: 2px solid #333; font-weight: bold;">Net</th>
+                                <th style="width: 10%; background-color: #f0f0f0; padding: 10px 8px; text-align: right; border-bottom: 2px solid #333; font-weight: bold;">Tax</th>
+                                <th style="width: 10%; background-color: #f0f0f0; padding: 10px 8px; text-align: right; border-bottom: 2px solid #333; font-weight: bold;">Gross</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <apex:repeat value="{!relatedTo.Sales_Invoice_Lines__r }" var="lineItem">
+                                <tr>
+                                    <td style="padding: 10px 8px; border-bottom: 1px solid #ddd;">{!lineItem.Product__r.Name}</td>
+                                    <td style="padding: 10px 8px; border-bottom: 1px solid #ddd; text-align: center;">{!lineItem.Product__r.Description}</td>
+                                    <td style="padding: 10px 8px; border-bottom: 1px solid #ddd; text-align: right;">
+                                        <apex:outputText value="{0, number, #,##0.00}">
+                                            <apex:param value="{!lineItem.Quantity__c}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="padding: 10px 8px; border-bottom: 1px solid #ddd; text-align: right;">
+                                        <apex:outputText value="{0, number, #,##0.00}">
+                                            <apex:param value="{!lineItem.Unit_Price__c}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="padding: 10px 8px; border-bottom: 1px solid #ddd; text-align: right;">{!lineItem.Discount__c}%</td>
+                                    <td style="padding: 10px 8px; border-bottom: 1px solid #ddd; text-align: right;">{!lineItem.Tax_Rate__c}%</td>
+                                    <td style="padding: 10px 8px; border-bottom: 1px solid #ddd; text-align: right;">
+                                        <apex:outputText value="{0, number, #,##0.00}">
+                                            <apex:param value="{!lineItem.Net_Amount__c}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="padding: 10px 8px; border-bottom: 1px solid #ddd; text-align: right;">
+                                        <apex:outputText value="{0, number, #,##0.00}">
+                                            <apex:param value="{!lineItem.Tax_Amount__c}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="padding: 10px 8px; border-bottom: 1px solid #ddd; text-align: right;">
+                                        <apex:outputText value="{0, number, #,##0.00}">
+                                            <apex:param value="{!lineItem.Gross_Amount__c}" />
+                                        </apex:outputText>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                            
+                            <!-- Totals Row -->
+                            <tr>
+                                <td colspan="6" style="padding: 15px 8px; border-top: 2px solid #333; border-bottom: 2px solid #333; font-weight: bold; background-color: #f9f9f9; text-align: right;">TOTALS</td>
+                                <td style="padding: 15px 8px; border-top: 2px solid #333; border-bottom: 2px solid #333; font-weight: bold; background-color: #f9f9f9; text-align: right;">{!relatedTo.Net_Amount__c}</td>
+                                <td style="padding: 15px 8px; border-top: 2px solid #333; border-bottom: 2px solid #333; font-weight: bold; background-color: #f9f9f9; text-align: right;">{!relatedTo.Tax_Amount__c}</td>
+                                <td style="padding: 15px 8px; border-top: 2px solid #333; border-bottom: 2px solid #333; font-weight: bold; background-color: #f9f9f9; text-align: right;">{!relatedTo.Gross_Amount__c}</td>
+                            </tr>
+                            
+                            <!-- Less Paid Row -->
+                            <tr>
+                                <td colspan="8" style="padding: 10px 8px; border-bottom: 1px solid #ddd; text-align: right;">Less Paid</td>
+                                <td style="padding: 10px 8px; border-bottom: 1px solid #ddd; text-align: right;">{!relatedTo.Paid_Amount__c}</td>
+                            </tr>
+                            
+                            <!-- Amount Due Row -->
+                            <tr>
+                                <td colspan="8" style="padding: 15px 8px; border-bottom: 2px solid #333; font-weight: bold; font-size: 14px; text-align: right;">AMOUNT DUE</td>
+                                <td style="padding: 15px 8px; border-bottom: 2px solid #333; font-weight: bold; font-size: 14px; text-align: right;">0.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </body>
+        </html>
+    </messaging:htmlEmailBody>
+</messaging:emailTemplate>

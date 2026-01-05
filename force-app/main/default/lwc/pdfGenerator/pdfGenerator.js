@@ -1,12 +1,19 @@
-import { LightningElement, api, wire } from 'lwc';
+import { LightningElement, api, wire, track } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getInvoiceDetails from '@salesforce/apex/PdfGeneratorController.getInvoiceDetails';
+import getRecipientEmail from '@salesforce/apex/PdfGeneratorController.getRecipientEmail';
+import sendInvoiceEmailWithTemplate from '@salesforce/apex/PdfGeneratorController.sendInvoiceEmailWithTemplate';
 export default class PdfGenerator extends LightningElement {
     recordId;
     invoiceDetails = {};
     templateName = '';
-    isLoading = true;
+    @track isLoading = true;
     baseUrl = '';
+    @track isSendingEmail = false;
+    recipientEmail = [];
+    recipientId = '';
+    emailTemplateName = 'Invoice_Email_Template';
 
     @wire(CurrentPageReference)
     getPageRef(pageRef) {
@@ -30,6 +37,7 @@ export default class PdfGenerator extends LightningElement {
                 console.log('Invoice Details:', result);
                 this.invoiceDetails = result;
                 this.setTemplateName();
+                this.getRecipientEmail();
                 this.isLoading = false;
             })
             .catch(error => {
@@ -47,6 +55,23 @@ export default class PdfGenerator extends LightningElement {
         console.log('Template Name set to:', this.templateName);
     }
 
+    getRecipientEmail() {
+        const accId = this.invoiceDetails?.s2p3__To_Account__c;
+        if (accId) {
+            getRecipientEmail({ accountId: accId })
+                .then(result => {
+                    console.log("recipient emails: ", result);
+                    this.recipientEmail = result.map(con => {
+                        return con.Email
+                    });
+                    this.recipientId = result[0].Id;
+                }).catch(error => {
+                    console.error('Error fetching recipient emails:', error);
+                    this.isLoading = false;
+                });
+        }
+    }
+
     get iframeUrl() {
         if (!this.invoiceDetails?.Id || !this.templateName) {
             return '';
@@ -60,7 +85,52 @@ export default class PdfGenerator extends LightningElement {
         return !this.isLoading && this.iframeUrl;
     }
 
+    get sendButtonLabel() {
+        return this.isSendingEmail ? 'Sending...' : 'Send Mail'
+    }
+
     handleSendMail() {
-        console.log("Send Mail");
+        console.log("Send Mail to:", this.recipientEmail);
+
+        if (!this.recipientEmail) {
+            this.showToast('Warning', 'Please enter a recipient email address', 'warning');
+            return;
+        }
+
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(this.recipientEmail)) {
+            this.showToast('Warning', 'Please enter a valid email address', 'warning');
+            return;
+        }
+
+        this.isSendingEmail = true;
+
+        sendInvoiceEmailWithTemplate({
+            invoiceId: this.recordId,
+            invoiceTemplateName: this.templateName,
+            emailTemplateName: this.emailTemplateName,
+            toEmail: this.recipientEmail,
+            conId: this.recipientId
+        })
+            .then(result => {
+                console.log('Email sent successfully:', result);
+                this.showToast('Success', result, 'success');
+                this.isSendingEmail = false;
+            })
+            .catch(error => {
+                console.error('Error sending email:', error);
+                this.showToast('Error', error.body?.message || 'Failed to send email', 'error');
+                this.isSendingEmail = false;
+            });
+    }
+
+    showToast(title, message, variant) {
+        const event = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        });
+        this.dispatchEvent(event);
     }
 }
